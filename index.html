@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estimation Immobilière - Saint-Maur-des-Fossés</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin: 0;
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .form-container {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .results-container {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .result-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        .estimation-price {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        
+        .price-range {
+            display: flex;
+            justify-content: space-between;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+        
+        #chart {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .quartiers-select {
+            margin-bottom: 20px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Estimation Immobilière à Saint-Maur-des-Fossés</h1>
+        <p>Obtenez une estimation de votre bien immobilier basée sur les dernières transactions</p>
+    </header>
+    
+    <div class="container">
+        <div class="form-container">
+            <h2>Caractéristiques du bien</h2>
+            <form id="estimationForm">
+                <div class="form-group">
+                    <label for="typeProperty">Type de bien</label>
+                    <select id="typeProperty" required>
+                        <option value="">Sélectionnez</option>
+                        <option value="apartment">Appartement</option>
+                        <option value="house">Maison</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quartier">Quartier</label>
+                    <select id="quartier" required>
+                        <option value="">Sélectionnez</option>
+                        <option value="La Varenne">La Varenne</option>
+                        <option value="Le Parc">Le Parc</option>
+                        <option value="Vieux Saint-Maur">Vieux Saint-Maur</option>
+                        <option value="Saint-Maur Créteil">Saint-Maur Créteil</option>
+                        <option value="Le Pont de Créteil">Le Pont de Créteil</option>
+                        <option value="Champignol">Champignol</option>
+                        <option value="Les Mûriers">Les Mûriers</option>
+                        <option value="La Pie">La Pie</option>
+                        <option value="Adamville">Adamville</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="surface">Surface (m²)</label>
+                    <input type="number" id="surface" min="10" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="bedrooms">Nombre de chambres</label>
+                    <input type="number" id="bedrooms" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="condition">État du bien</label>
+                    <select id="condition" required>
+                        <option value="">Sélectionnez</option>
+                        <option value="travaux">À rénover</option>
+                        <option value="correct">Correct</option>
+                        <option value="bon">Bon état</option>
+                        <option value="neuf">Neuf / Rénové</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="exterior">Extérieur</label>
+                    <select id="exterior" required>
+                        <option value="">Sélectionnez</option>
+                        <option value="none">Aucun</option>
+                        <option value="balcony">Balcon</option>
+                        <option value="terrace">Terrasse</option>
+                        <option value="garden">Jardin</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="parking">Stationnement</label>
+                    <select id="parking" required>
+                        <option value="">Sélectionnez</option>
+                        <option value="none">Aucun</option>
+                        <option value="street">Stationnement rue</option>
+                        <option value="garage">Garage / Box</option>
+                    </select>
+                </div>
+                
+                <button type="submit">Estimer mon bien</button>
+            </form>
+        </div>
+        
+        <div class="results-container">
+            <h2>Résultats de l'estimation</h2>
+            <div id="resultsArea">
+                <p>Remplissez le formulaire pour obtenir une estimation de votre bien.</p>
+            </div>
+            
+            <div id="chart"></div>
+            
+            <div id="comparableProps" style="margin-top: 30px;">
+                <h3>Biens comparables</h3>
+                <p>Les biens similaires apparaîtront ici après l'estimation.</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2025 Estimation Immobilière Saint-Maur-des-Fossés | Données issues de transactions récentes</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chart.js/3.9.1/chart.min.js"></script>
+    <script>
+        // Prix moyens fictifs par quartier pour l'exemple (€/m²)
+        const prixMoyensParQuartier = {
+            "La Varenne": 8500,
+            "Le Parc": 8200,
+            "Vieux Saint-Maur": 7800,
+            "Saint-Maur Créteil": 7300,
+            "Le Pont de Créteil": 7000,
+            "Champignol": 7600,
+            "Les Mûriers": 7100,
+            "La Pie": 6900,
+            "Adamville": 7400
+        };
+        
+        // Modificateurs fictifs selon les caractéristiques
+        const modificateurs = {
+            typeProperty: {
+                "apartment": 0,
+                "house": 0.15 // Bonus pour une maison
+            },
+            condition: {
+                "travaux": -0.15, // Malus pour un bien à rénover
+                "correct": -0.05,
+                "bon": 0,
+                "neuf": 0.1 // Bonus pour un bien neuf
+            },
+            exterior: {
+                "none": 0,
+                "balcony": 0.03,
+                "terrace": 0.07,
+                "garden": 0.1
+            },
+            parking: {
+                "none": 0,
+                "street": 0.01,
+                "garage": 0.05
+            }
+        };
+        
+        // Données fictives pour simuler les résultats de la base Airtable
+        const biensComparables = [
+            {
+                type: "apartment",
+                quartier: "La Varenne",
+                surface: 65,
+                chambres: 2,
+                etat: "bon",
+                exterieur: "balcony",
+                parking: "street",
+                prix: 555000
+            },
+            {
+                type: "apartment",
+                quartier: "La Varenne",
+                surface: 70,
+                chambres: 3,
+                etat: "correct",
+                exterieur: "none",
+                parking: "none",
+                prix: 560000
+            },
+            {
+                type: "house",
+                quartier: "La Varenne",
+                surface: 110,
+                chambres: 4,
+                etat: "bon",
+                exterieur: "garden",
+                parking: "garage",
+                prix: 980000
+            },
+            // Plus de données pour les autres quartiers...
+        ];
+        
+       async function fetchFromAirtable(quartier) {
+  // Utilisation d'une vue partagée (lecture seule)
+  // Remplacez avec votre lien de partage Airtable
+  const sharedViewUrl = 'https://airtable.com/appJ4PVuafdWKR6jb/shrSqoHBte9gZYGqa';
+  
+  // Pour filtrer, on doit le faire côté client dans cette approche
+  const response = await fetch(sharedViewUrl);
+  const data = await response.json();
+  
+  // Filtrer les données par quartier côté client
+  return data.records
+    .map(record => record.fields)
+    .filter(property => property.Quartier === quartier);
+}
+        
+        document.getElementById('estimationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Afficher l'indicateur de chargement
+            document.getElementById('resultsArea').innerHTML = '<div class="loading">Calcul de l\'estimation en cours...</div>';
+            
+            // Récupérer les valeurs du formulaire
+            const typeProperty = document.getElementById('typeProperty').value;
+            const quartier = document.getElementById('quartier').value;
+            const surface = parseFloat(document.getElementById('surface').value);
+            const bedrooms = parseInt(document.getElementById('bedrooms').value);
+            const condition = document.getElementById('condition').value;
+            const exterior = document.getElementById('exterior').value;
+            const parking = document.getElementById('parking').value;
+            
+            // Récupérer les biens comparables (simulation Airtable)
+            const biensSimilaires = await fetchFromAirtable(quartier);
+            
+            // Calculer l'estimation
+            const prixMoyen = prixMoyensParQuartier[quartier];
+            
+            // Appliquer les modificateurs
+            let coefficient = 1.0;
+            coefficient += modificateurs.typeProperty[typeProperty] || 0;
+            coefficient += modificateurs.condition[condition] || 0;
+            coefficient += modificateurs.exterior[exterior] || 0;
+            coefficient += modificateurs.parking[parking] || 0;
+            
+            // Ajustement en fonction du nombre de chambres (fictif)
+            coefficient += (bedrooms > 2) ? 0.03 * (bedrooms - 2) : 0;
+            
+            // Calculer le prix estimé
+            const prixEstime = Math.round(prixMoyen * surface * coefficient);
+            
+            // Définir une fourchette de prix (+/- 7%)
+            const prixMin = Math.round(prixEstime * 0.93);
+            const prixMax = Math.round(prixEstime * 1.07);
+            
+            // Afficher le résultat
+            let resultsHTML = `
+                <div class="result-card">
+                    <h3>Estimation de votre bien</h3>
+                    <p>Votre ${typeProperty === 'apartment' ? 'appartement' : 'maison'} de ${surface} m² à ${quartier}</p>
+                    <div class="estimation-price">${prixEstime.toLocaleString('fr-FR')} €</div>
+                    <div class="price-range">
+                        <span>Min: ${prixMin.toLocaleString('fr-FR')} €</span>
+                        <span>Max: ${prixMax.toLocaleString('fr-FR')} €</span>
+                    </div>
+                    <p>Prix au m²: ${Math.round(prixEstime / surface).toLocaleString('fr-FR')} €/m²</p>
+                </div>
+            `;
+            
+            document.getElementById('resultsArea').innerHTML = resultsHTML;
+            
+            // Afficher le graphique
+            createChart(quartier, prixEstime / surface);
+            
+            // Afficher les biens comparables
+            displayComparableProperties(biensSimilaires);
+        });
+        
+        function createChart(quartier, prixActuel) {
+            // Créer des données fictives pour le graphique
+            const ctx = document.getElementById('chart').getContext('2d');
+            
+            // Détruire le graphique existant s'il y en a un
+            if (window.myChart) {
+                window.myChart.destroy();
+            }
+            
+            // Créer des données pour l'évolution des prix
+            const labels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+            const quartierData = labels.map((_, i) => {
+                const basePrice = prixMoyensParQuartier[quartier];
+                // Générer une légère variation pour simuler l'évolution
+                return basePrice * (1 + (Math.sin(i / 2) * 0.03));
+            });
+            
+            // Créer le graphique
+            window.myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `Prix moyen au m² à ${quartier} (2024-2025)`,
+                        data: quartierData,
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Évolution des prix au m²'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toLocaleString('fr-FR') + ' €/m²';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString('fr-FR') + ' €';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function displayComparableProperties(properties) {
+            if (properties.length === 0) {
+                document.getElementById('comparableProps').innerHTML = '<h3>Biens comparables</h3><p>Aucun bien comparable trouvé dans ce quartier.</p>';
+                return;
+            }
+            
+            let html = '<h3>Biens comparables récemment vendus</h3>';
+            
+            properties.forEach(property => {
+                html += `
+                    <div class="result-card">
+                        <p><strong>${property.type === 'apartment' ? 'Appartement' : 'Maison'} - ${property.surface} m²</strong> - ${property.chambres} chambre(s)</p>
+                        <p>
+                            État: ${{"travaux": "À rénover", "correct": "Correct", "bon": "Bon état", "neuf": "Neuf / Rénové"}[property.etat]}<br>
+                            ${{"none": "Sans extérieur", "balcony": "Avec balcon", "terrace": "Avec terrasse", "garden": "Avec jardin"}[property.exterieur]}<br>
+                            ${{"none": "Sans stationnement", "street": "Stationnement rue", "garage": "Avec garage"}[property.parking]}
+                        </p>
+                        <div class="estimation-price">${property.prix.toLocaleString('fr-FR')} €</div>
+                        <p>Prix au m²: ${Math.round(property.prix / property.surface).toLocaleString('fr-FR')} €/m²</p>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('comparableProps').innerHTML = html;
+        }
+    </script>
+</body>
+</html>
